@@ -1,0 +1,7 @@
+{
+  "name": "CVMTL API",
+  "version": "0.0.1",
+  "description": "The API documentation for the CVMTL API Server",
+  "title": "CVMTL Private REST API",
+  "url" : "https://www.corridorsvertsmtl.org/api"
+}
