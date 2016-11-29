@@ -5,7 +5,8 @@
   "main": "lib/main.js",
   "scripts": {
     "start": "node lib/main.js",
-    "test": "eslint lib && mocha --timeout 10000",
+    "mocha-test": "eslint lib && mocha --timeout 10000",
+    "test": "eslint lib",    
     "gendocs": "jsdoc -c ./conf.json -t ./node_modules/ink-docstrap/template -R README.md -r --destination docs lib && apidoc -i lib/ -o docs/apidoc/"
   },
   "author": "",
@@ -27,6 +28,7 @@
     "passport-oauth2": "^1.3.0",
     "passport-wpoauth": "git+https://github.com/ajmas/passport-wpoauth.git",
     "sequelize": "^3.24.3",
+    "sequelize-transactions": "^1.0.1",
     "url": "^0.11.0",
     "winston": "^2.3.0",
     "wpcom-oauth": "^0.3.3"
@@ -41,6 +43,7 @@
     "eslint-plugin-standard": "^2.0.1",
     "ink-docstrap": "^1.3.0",
     "jsdoc": "^3.4.2",
-    "mocha": "^2.4.5"
+    "mocha": "^2.4.5",
+    "sqlite3": "^3.1.8"
   }
 }
