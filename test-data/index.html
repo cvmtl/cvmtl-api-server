@@ -1,0 +1,192 @@
+<html>
+
+<head>
+    <title>Manual Tests</title>
+
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+
+    <script type="text/javascript">
+        var baseUrl = '';
+        var authenticated;
+        var userInfo;
+
+        $["postJSON"] = function(url, data, callback) {
+            // shift arguments if data argument was omitted
+            if (jQuery.isFunction(data)) {
+                callback = data;
+                data = undefined;
+            }
+
+            return $.ajax({
+                url: url,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: data,
+                success: callback
+            });
+        };
+
+        function createnewprojectFromForm() {
+            var form = $('form[name=newproject]');
+            var polygon = $('textarea[name=polygon]', form).val();
+            var shortname = $('input[name=shortname]', form).val();
+            var title = $('input[name=title]', form).val();
+            var description = $('textarea[name=description]', form).val();
+
+            var geojson = JSON.parse(polygon);
+
+            var data = {
+                area: geojson,
+                title: title,
+                shortname: shortname,
+                description: description
+            };
+
+            $.ajax({
+                url: baseUrl + '/api/projects',
+                type: 'post',
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                success: function(data) {
+                    console.log("second success", data);
+                },
+                data: JSON.stringify(data)
+            });
+
+            //  $.postJSON(baseUrl + '/api/projects', data, function(response) {
+            //     console.log('submitted');
+            //  })
+            //  .done(function(data) {
+            //     console.log( "second success", data );
+            // })
+            // .fail(function(data) {
+            //     console.log("error", data );
+            // })
+        }
+
+        function loginWordPress() {
+            $.getJSON(baseUrl + '/api/auth/wordpress')
+                .done(function(json) {
+                    $('#userprofile').html(JSON.stringify(json, undefined, '  '));
+                    authenticated = true;
+                    $('input[name=submit]', form).removeAttr('disabled');
+                    $('#authenticated').html('Authenticated: true');
+                }).fail(function(jqxhr, textStatus, error) {
+                    var err = textStatus + ", " + error;
+                    console.log("Request Failed: " + err);
+                });
+        }
+
+        // https://www.corridorsvertsmtl.org/api/auth/profile
+
+        $(document).ready(function() {
+            var form = $('form[name=newproject]');
+
+            //loginWordPress();
+
+            $('input[name=submit]', form).attr('disabled', 'disabled');
+            form.submit(function(event) {
+                event.preventDefault();
+                createnewprojectFromForm();
+            });
+
+            $.getJSON(baseUrl + '/api/auth/profile')
+                .done(function(json) {
+
+                    $('input[name=submit]', form).removeAttr('disabled');
+                    $('#userprofile').html(JSON.stringify(json, undefined, '  '));
+                    authenticated = true;
+
+                    //              console.log( "JSON Data: " + json );
+                }).fail(function(jqxhr, textStatus, error) {
+                    var err = textStatus + ", " + error;
+                    $('#userprofile').html('error: ' + err);
+                    console.log("Request Failed: ", error, jqxhr, textStatus);
+                });
+            $('input[name=submit]', form).removeAttr('disabled');
+
+        });
+    </script>
+
+    <style type="text/css">
+        label {
+            width: 200px;
+            display: inline-block;
+        }
+        
+        input,
+        textarea {
+            margin-bottom: 10px;
+        }
+        
+        #userprofile {
+            font-family: monospace;
+            white-space: pre;
+        }
+        
+        #loginwith ul {
+            padding: 3px;
+        }
+        
+        #loginwith li {
+            display: inline-block;
+            border: solid 1px gray;
+            padding: 4px 8px 4px 8px;
+            border-radius: 4px;
+        }
+        
+        #loginwith li a {
+            text-decoration: none;
+        }
+        
+        #loginwith li a:hover {
+            text-decoration: underline;
+        }
+        
+        #loginwith li.google,
+        #loginwith li.google a {
+            background-color: red;
+            color: white;
+        }
+        
+        #loginwith li.facebook,
+        #loginwith li.facebook a {
+            background-color: #3b5998;
+            color: white;
+        }
+        
+        #loginwith li.wordpress,
+        #loginwith li.wordpress a {
+            background-color: #0087be;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="authenticated">Authenticated: false</div>
+    <div id="loginwith">
+        <ul>
+            <li class="google"><a href="/api/auth/google">Login with Google</a></li>
+            <li class="facebook"><a href="/api/auth/facebook">Login with Facebook</a></li>
+            <li class="wordpress"><a href="/api/auth/wordpress">Login with Wordpress@corridorsvertsmtl.org</a></li>
+        </ul>
+
+        <h2>User Profile</h2>
+        <div id="userprofile"></div>
+
+        <h2>Add Project</h2>
+        <div id="addmarker">
+            <form name="newproject">
+                <label>Title:<label> <input type="text" name="title" placeHolder="the title of your project" size="80"/> <br/>
+   <label>Short Name:<label> <input type="text" name="shortname" placeHolder="short name of the project, to tie in with WP entry" size="80"/> <br/>
+   <label>GeoJSON Polygin:<label> <textarea cols="80" rows="20" name="polygon"></textarea> <br/>
+   <label>Description:<label> <textarea cols="80" rows="20" name="description"></textarea> <br/>
+   <input type="submit" name="submit"/>
+</form>
+</div>
+
+</body>
+</html>
